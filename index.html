@@ -262,11 +262,11 @@
 
   <div class="marquee">
     <div class="bulbs" id="bulbs"></div>
-    <span class="eyebrow">Народное казино им. Отдела Кадров</span>
+    <span class="eyebrow">Народное казино им. Отдела Кадырова</span>
     <h1>Поднять зарплату Никите</h1>
   </div>
 
-  <p class="subtitle">Крути колесо судьбы и узнай, чего сегодня заслуживает Никита. Комиссия не отвечает за результат.</p>
+  <p class="subtitle">Крути колесо судьбы и узнай, чего сегодня заслуживает Никита. ФРС США не отвечает за результат.</p>
 
   <div class="stats">
     <div class="stat salary">
@@ -277,13 +277,13 @@
       <div class="label">Жопки огурцов</div>
       <div class="value" id="cucumberVal">3 🥒</div>
     </div>
-    <div class="stat clicks">
-      <div class="label">Нажатий</div>
-      <div class="value" id="clicksVal">0</div>
-    </div>
     <div class="stat cats">
       <div class="label">Драные котики</div>
       <div class="value" id="catsVal">0 🐈</div>
+    </div>
+    <div class="stat clicks">
+      <div class="label">Нажатий</div>
+      <div class="value" id="clicksVal">0</div>
     </div>
   </div>
 
@@ -300,7 +300,7 @@
 
   <div class="result" id="result"></div>
 
-  <footer>© Отдел Кадров. Результаты розыгрыша окончательны и обжалованию не подлежат.</footer>
+  <footer>© Отдел Кадыров. Результаты розыгрыша окончательны и обжалованию не подлежат.</footer>
 
 <script>
 (function(){
@@ -326,18 +326,18 @@
   // ---------- сектора ----------
   const sectors = [
     { label:'×0,8',              type:'mult',  value:0.8,  color:'#7a1f1f' },
-    { label:'Драный котик',      type:'cat',   value:0,    color:'#1b1f3b' },
-    { label:'+3 огурца',         type:'cuke',  value:3,    color:'#3d7a2f' },
+    { label:'Котик',      type:'cat',   value:0,    color:'#1b1f3b' },
+    { label:'+3 жопки огурца',         type:'cuke',  value:3,    color:'#3d7a2f' },
     { label:'На 2 доширака',     type:'add',   value:178,  color:'#d4af37' },
     { label:'×1,15',             type:'mult',  value:1.15, color:'#7a1f1f' },
-    { label:'Мимо',              type:'none',  value:0,    color:'#4a4a4a' },
+    { label:'Никита уволен',     type:'fired', value:0,    color:'#111111' },
+    { label:'Депремирование',    type:'mult',  value:0.5,    color:'#4a4a4a' },
     { label:'×0,5',              type:'mult',  value:0.5,  color:'#1b1f3b' },
-    { label:'+1 огурец',         type:'cuke',  value:1,    color:'#3d7a2f' },
+    { label:'+1 жопка огуреца',         type:'cuke',  value:1,    color:'#3d7a2f' },
     { label:'×2 ДЖЕКПОТ!',       type:'mult',  value:2,    color:'#d4af37' },
-    { label:'Премию отменили',   type:'add',   value:-100000,color:'#7a1f1f' },
+    { label:'-100 000',   type:'add',   value:-100000,color:'#7a1f1f' },
     { label:'+100 000 ₽',        type:'add',   value:100000, color:'#264d73' },
     { label:'×20 СУПЕРПРИЗ!',    type:'mult',  value:20,   color:'#9b1c8f' },
-    { label:'Никита уволен',     type:'fired', value:0,    color:'#111111' },
     { label:'Никита уволен',     type:'fired', value:0,    color:'#111111' },
   ];
 
