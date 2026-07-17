@@ -433,7 +433,7 @@
   async function fetchRemoteState(){
     const res = await fetch(REMOTE_URL, { cache:'no-store' });
     if(res.status === 404){
-      await fetch(REMOTE_URL, { method:'PUT', body: JSON.stringify(defaultState) });
+      await fetch(REMOTE_URL, { method:'POST', body: JSON.stringify(defaultState) });
       return { ...defaultState };
     }
     if(!res.ok) throw new Error('Плохой статус ответа: ' + res.status);
@@ -442,7 +442,7 @@
   }
 
   async function pushRemoteState(s){
-    const res = await fetch(REMOTE_URL, { method:'PUT', body: JSON.stringify(s) });
+    const res = await fetch(REMOTE_URL, { method:'POST', body: JSON.stringify(s) });
     if(!res.ok) throw new Error('Не удалось записать состояние: ' + res.status);
   }
 
