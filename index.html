@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Поднять зарплату Никите</title>
+<style>
+  :root{
+    --red:#7a1f1f;
+    --red-dark:#5a1414;
+    --gold:#d4af37;
+    --gold-light:#f2d98a;
+    --cream:#f4e9d8;
+    --navy:#1b1f3b;
+    --ink:#2a1810;
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 50% -10%, #9a3030 0%, var(--red) 45%, var(--red-dark) 100%);
+    font-family: 'Georgia', 'PT Serif', serif;
+    color:var(--cream);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:24px 16px 60px;
+  }
+
+  /* -------- marquee title -------- */
+  .marquee{
+    position:relative;
+    margin:20px auto 8px;
+    padding:22px 34px;
+    background:linear-gradient(180deg, var(--navy), #10142a);
+    border:6px solid var(--gold);
+    border-radius:14px;
+    box-shadow: 0 10px 0 rgba(0,0,0,.35), 0 18px 30px rgba(0,0,0,.45);
+    max-width:720px;
+  }
+  .marquee::before, .marquee::after{
+    content:"";
+    position:absolute;
+    top:6px; bottom:6px; left:6px; right:6px;
+    border-radius:8px;
+    background-image: radial-gradient(circle, var(--gold-light) 2.2px, transparent 2.6px);
+    background-size: 22px 22px;
+    background-position: center;
+    padding:4px;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    opacity:.55;
+    pointer-events:none;
+  }
+  .marquee .bulbs{
+    position:absolute;
+    inset:0;
+    border-radius:8px;
+    overflow:hidden;
+    pointer-events:none;
+  }
+  .bulb{
+    position:absolute;
+    width:6px;height:6px;
+    border-radius:50%;
+    background:var(--gold-light);
+    box-shadow:0 0 6px 2px rgba(242,217,138,.9);
+    animation: blink 1.6s infinite ease-in-out;
+  }
+  @keyframes blink{
+    0%,100%{opacity:.25; transform:scale(.85);}
+    50%{opacity:1; transform:scale(1.05);}
+  }
+
+  h1{
+    position:relative;
+    margin:0;
+    text-align:center;
+    font-size:clamp(28px,5.2vw,46px);
+    letter-spacing:.5px;
+    color:var(--gold-light);
+    text-shadow: 0 2px 0 #000, 0 0 18px rgba(212,175,55,.5);
+    line-height:1.15;
+  }
+  .eyebrow{
+    display:block;
+    font-family: 'Trebuchet MS', sans-serif;
+    font-size:13px;
+    letter-spacing:4px;
+    text-transform:uppercase;
+    color:var(--gold);
+    opacity:.85;
+    margin-bottom:6px;
+  }
+
+  .subtitle{
+    max-width:560px;
+    text-align:center;
+    color:var(--cream);
+    opacity:.8;
+    font-size:15px;
+    margin:14px 0 34px;
+    font-family:'Trebuchet MS', sans-serif;
+  }
+
+  /* -------- stats panel -------- */
+  .stats{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+    justify-content:center;
+    margin-bottom:30px;
+  }
+  .stat{
+    background:var(--cream);
+    color:var(--ink);
+    border-radius:10px;
+    padding:12px 20px;
+    min-width:150px;
+    text-align:center;
+    box-shadow:0 5px 0 rgba(0,0,0,.25);
+    border:2px solid var(--gold);
+  }
+  .stat .label{
+    font-family:'Trebuchet MS', sans-serif;
+    font-size:11px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    opacity:.6;
+    margin-bottom:4px;
+  }
+  .stat .value{
+    font-size:22px;
+    font-weight:bold;
+  }
+  .stat.salary .value{ color:var(--red); }
+  .stat.cucumbers .value{ color:#3d7a2f; }
+  .stat.clicks .value{ color:var(--navy); }
+  .stat.cats .value{ color:#5a3a1a; }
+
+  /* -------- wheel -------- */
+  .wheel-zone{
+    position:relative;
+    width:min(400px, 88vw);
+    aspect-ratio:1/1;
+    margin-bottom:26px;
+  }
+  .pointer{
+    position:absolute;
+    top:-14px;
+    left:50%;
+    transform:translateX(-50%);
+    width:0; height:0;
+    border-left:18px solid transparent;
+    border-right:18px solid transparent;
+    border-top:32px solid var(--gold-light);
+    filter: drop-shadow(0 3px 2px rgba(0,0,0,.5));
+    z-index:5;
+  }
+  .wheel-frame{
+    position:absolute;
+    inset:0;
+    border-radius:50%;
+    background: conic-gradient(from 0deg, var(--gold), var(--gold-light), var(--gold));
+    padding:10px;
+    box-shadow: 0 10px 0 rgba(0,0,0,.3), 0 20px 35px rgba(0,0,0,.5);
+  }
+  canvas#wheel{
+    width:100%;
+    height:100%;
+    border-radius:50%;
+    display:block;
+    transform: rotate(0deg);
+    background:var(--navy);
+  }
+  .hub{
+    position:absolute;
+    top:50%; left:50%;
+    width:19%;
+    aspect-ratio:1/1;
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, var(--gold-light), var(--gold) 55%, #8a6a1c 100%);
+    box-shadow: 0 3px 8px rgba(0,0,0,.6), inset 0 2px 4px rgba(255,255,255,.5);
+    z-index:4;
+    border:3px solid var(--red-dark);
+  }
+
+  /* -------- button -------- */
+  button#spinBtn{
+    font-family:'Trebuchet MS', sans-serif;
+    font-weight:bold;
+    font-size:18px;
+    letter-spacing:.5px;
+    color:var(--ink);
+    background:linear-gradient(180deg, var(--gold-light), var(--gold));
+    border:none;
+    border-radius:50px;
+    padding:16px 36px;
+    cursor:pointer;
+    box-shadow:0 6px 0 #8a6a1c, 0 12px 20px rgba(0,0,0,.4);
+    transition: transform .08s ease, box-shadow .08s ease;
+  }
+  button#spinBtn:active{
+    transform:translateY(4px);
+    box-shadow:0 2px 0 #8a6a1c, 0 6px 12px rgba(0,0,0,.4);
+  }
+  button#spinBtn:disabled{
+    opacity:.6;
+    cursor:not-allowed;
+    transform:none;
+  }
+
+  .sync-note{
+    margin-top:12px;
+    font-family:'Trebuchet MS', sans-serif;
+    font-size:12px;
+    color:var(--gold-light);
+    opacity:.75;
+    text-align:center;
+    max-width:420px;
+  }
+
+  /* -------- result banner -------- */
+  .result{
+    margin-top:26px;
+    min-height:64px;
+    max-width:520px;
+    text-align:center;
+    font-family:'Trebuchet MS', sans-serif;
+    font-size:17px;
+    padding:14px 22px;
+    border-radius:10px;
+    background:rgba(0,0,0,.25);
+    border:1px solid rgba(212,175,55,.4);
+    opacity:0;
+    transition:opacity .4s ease;
+  }
+  .result.show{ opacity:1; }
+  .result b{ color:var(--gold-light); }
+
+  footer{
+    margin-top:40px;
+    font-family:'Trebuchet MS', sans-serif;
+    font-size:12px;
+    opacity:.45;
+    text-align:center;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    canvas#wheel{ transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="marquee">
+    <div class="bulbs" id="bulbs"></div>
+    <span class="eyebrow">Народное казино им. Отдела Кадров</span>
+    <h1>Поднять зарплату Никите</h1>
+  </div>
+
+  <p class="subtitle">Крути колесо судьбы и узнай, чего сегодня заслуживает Никита. Комиссия не отвечает за результат.</p>
+
+  <div class="stats">
+    <div class="stat salary">
+      <div class="label">Зарплата</div>
+      <div class="value" id="salaryVal">100 000 ₽</div>
+    </div>
+    <div class="stat cucumbers">
+      <div class="label">Жопки огурцов</div>
+      <div class="value" id="cucumberVal">3 🥒</div>
+    </div>
+    <div class="stat clicks">
+      <div class="label">Нажатий</div>
+      <div class="value" id="clicksVal">0</div>
+    </div>
+    <div class="stat cats">
+      <div class="label">Драные котики</div>
+      <div class="value" id="catsVal">0 🐈</div>
+    </div>
+  </div>
+
+  <div class="wheel-zone">
+    <div class="pointer"></div>
+    <div class="wheel-frame">
+      <canvas id="wheel" width="600" height="600"></canvas>
+    </div>
+    <div class="hub"></div>
+  </div>
+
+  <button id="spinBtn">Крутить барабан 🎰</button>
+  <div class="sync-note" id="syncNote"></div>
+
+  <div class="result" id="result"></div>
+
+  <footer>© Отдел Кадров. Результаты розыгрыша окончательны и обжалованию не подлежат.</footer>
+
+<script>
+(function(){
+
+  // ---------- бегущие лампочки в рамке ----------
+  const bulbsBox = document.getElementById('bulbs');
+  const bulbCount = 46;
+  for(let i=0;i<bulbCount;i++){
+    const b = document.createElement('div');
+    b.className='bulb';
+    const t = i/bulbCount;
+    let x,y;
+    if(t<0.25){ x = t/0.25*100; y=0; }
+    else if(t<0.5){ x=100; y=(t-0.25)/0.25*100; }
+    else if(t<0.75){ x=100-(t-0.5)/0.25*100; y=100; }
+    else { x=0; y=100-(t-0.75)/0.25*100; }
+    b.style.left = x+'%';
+    b.style.top = y+'%';
+    b.style.animationDelay = (i*0.07)+'s';
+    bulbsBox.appendChild(b);
+  }
+
+  // ---------- сектора ----------
+  const sectors = [
+    { label:'×0,8',              type:'mult',  value:0.8,  color:'#7a1f1f' },
+    { label:'Драный котик',      type:'cat',   value:0,    color:'#1b1f3b' },
+    { label:'+3 огурца',         type:'cuke',  value:3,    color:'#3d7a2f' },
+    { label:'На 2 доширака',     type:'add',   value:178,  color:'#d4af37' },
+    { label:'×1,15',             type:'mult',  value:1.15, color:'#7a1f1f' },
+    { label:'Мимо',              type:'none',  value:0,    color:'#4a4a4a' },
+    { label:'×0,5',              type:'mult',  value:0.5,  color:'#1b1f3b' },
+    { label:'−5 огурцов',        type:'cuke',  value:-5,   color:'#3d7a2f' },
+    { label:'×2 ДЖЕКПОТ!',       type:'mult',  value:2,    color:'#d4af37' },
+    { label:'Премию отменили',   type:'add',   value:-5000,color:'#7a1f1f' },
+    { label:'+100 000 ₽',        type:'add',   value:100000, color:'#264d73' },
+    { label:'×20 СУПЕРПРИЗ!',    type:'mult',  value:20,   color:'#9b1c8f' },
+  ];
+
+  const n = sectors.length;
+  const sectorAngle = 360/n;
+
+  // ---------- рисуем колесо ----------
+  const canvas = document.getElementById('wheel');
+  const ctx = canvas.getContext('2d');
+  const size = canvas.width;
+  const cx = size/2, cy = size/2, r = size/2 - 6;
+
+  function drawWheel(){
+    ctx.clearRect(0,0,size,size);
+    for(let i=0;i<n;i++){
+      const start = (i*sectorAngle) * Math.PI/180;
+      const end = ((i+1)*sectorAngle) * Math.PI/180;
+
+      ctx.beginPath();
+      ctx.moveTo(cx,cy);
+      ctx.arc(cx,cy,r,start,end);
+      ctx.closePath();
+      ctx.fillStyle = sectors[i].color;
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#f2d98a';
+      ctx.stroke();
+
+      // текст
+      ctx.save();
+      ctx.translate(cx,cy);
+      ctx.rotate(start + (sectorAngle*Math.PI/180)/2);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#f4e9d8';
+      ctx.font = 'bold 20px Trebuchet MS, sans-serif';
+      ctx.shadowColor = 'rgba(0,0,0,.6)';
+      ctx.shadowBlur = 3;
+      wrapSectorText(ctx, sectors[i].label, r-24, 0);
+      ctx.restore();
+    }
+  }
+
+  function wrapSectorText(ctx, text, x, y){
+    const words = text.split(' ');
+    let lines = [];
+    let current = '';
+    words.forEach(w=>{
+      const test = current ? current+' '+w : w;
+      if(ctx.measureText(test).width > 140 && current){
+        lines.push(current);
+        current = w;
+      } else {
+        current = test;
+      }
+    });
+    if(current) lines.push(current);
+    lines.forEach((line, idx)=>{
+      const yOff = (idx - (lines.length-1)/2) * 22;
+      ctx.fillText(line, x, y+yOff);
+    });
+  }
+
+  drawWheel();
+
+  // ---------- общее состояние (для всех устройств) ----------
+  // Как подключить:
+  // 1. Один раз создайте бакет: откройте в браузере или через curl
+  //    curl -X POST https://kvdb.io/
+  //    В ответ придёт ID вида "AbCd1234EfGh5678". Скопируйте его.
+  // 2. Вставьте этот ID вместо REPLACE_WITH_YOUR_BUCKET_ID ниже.
+  // Пока ID не заменён, сайт будет работать в локальном режиме
+  // (прогресс отдельно на каждом устройстве, как раньше).
+  const KVDB_BUCKET = 'UHGRsoyGDkEk3kQ7VYd5av';
+  const REMOTE_URL = `https://kvdb.io/${KVDB_BUCKET}/nikita_state`;
+  const remoteEnabled = KVDB_BUCKET !== 'REPLACE_WITH_YOUR_BUCKET_ID';
+
+  const defaultState = { salary:100000, cucumbers:3, clicks:0, cats:0 };
+  let state = { ...defaultState };
+
+  function loadLocalCache(){
+    try{
+      const raw = localStorage.getItem('nikita_state_cache');
+      if(raw) return JSON.parse(raw);
+    }catch(e){}
+    return { ...defaultState };
+  }
+  function saveLocalCache(s){
+    try{
+      localStorage.setItem('nikita_state_cache', JSON.stringify(s));
+    }catch(e){
+      console.warn('Не удалось сохранить локальный кэш:', e);
+    }
+  }
+
+  async function fetchRemoteState(){
+    const res = await fetch(REMOTE_URL, { cache:'no-store' });
+    if(res.status === 404){
+      await fetch(REMOTE_URL, { method:'PUT', body: JSON.stringify(defaultState) });
+      return { ...defaultState };
+    }
+    if(!res.ok) throw new Error('Плохой статус ответа: ' + res.status);
+    const text = await res.text();
+    return JSON.parse(text);
+  }
+
+  async function pushRemoteState(s){
+    const res = await fetch(REMOTE_URL, { method:'PUT', body: JSON.stringify(s) });
+    if(!res.ok) throw new Error('Не удалось записать состояние: ' + res.status);
+  }
+
+  // сохранить состояние: и локально (кэш на случай офлайна), и в общее хранилище
+  async function saveState(){
+    saveLocalCache(state);
+    if(!remoteEnabled) return;
+    try{
+      await pushRemoteState(state);
+    }catch(e){
+      console.warn('Не удалось синхронизировать общий прогресс, сохранено только локально:', e);
+    }
+  }
+
+  // подтянуть самое свежее состояние прямо перед тем, как применить результат спина —
+  // так меньше шансов затереть прогресс, который кто-то добавил с другого устройства
+  async function refreshStateBeforeApply(){
+    if(!remoteEnabled) return;
+    try{
+      const fresh = await fetchRemoteState();
+      state = fresh;
+    }catch(e){
+      console.warn('Не удалось обновить состояние перед спином, использую локальное:', e);
+    }
+  }
+
+  const salaryVal = document.getElementById('salaryVal');
+  const cucumberVal = document.getElementById('cucumberVal');
+  const clicksVal = document.getElementById('clicksVal');
+  const catsVal = document.getElementById('catsVal');
+  const resultBox = document.getElementById('result');
+  const btn = document.getElementById('spinBtn');
+
+  function fmtMoney(v){
+    v = Math.round(v);
+    const negative = v < 0;
+    v = Math.abs(v);
+    const s = v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    return (negative?'−':'') + s + ' ₽';
+  }
+
+  function render(){
+    salaryVal.textContent = fmtMoney(state.salary);
+    cucumberVal.textContent = state.cucumbers + ' 🥒';
+    clicksVal.textContent = state.clicks;
+    catsVal.textContent = state.cats + ' 🐈';
+  }
+
+  // ---------- вращение ----------
+  let currentRotation = 0;
+  let spinning = false;
+
+  btn.disabled = true;
+  btn.textContent = 'Загрузка…';
+
+  async function init(){
+    if(remoteEnabled){
+      try{
+        state = await fetchRemoteState();
+      }catch(e){
+        console.warn('Общее хранилище недоступно, использую локальный кэш:', e);
+        state = loadLocalCache();
+      }
+    } else {
+      state = loadLocalCache();
+      const note = document.getElementById('syncNote');
+      note.textContent = '⚠️ Общий прогресс не настроен — см. комментарий в коде (KVDB_BUCKET). Пока прогресс хранится только в этом браузере.';
+    }
+    if(typeof state.cats !== 'number') state.cats = 0;
+    render();
+    btn.disabled = false;
+    btn.textContent = 'Крутить барабан 🎰';
+  }
+  init();
+
+  btn.addEventListener('click', async ()=>{
+    if(spinning) return;
+    spinning = true;
+    btn.disabled = true;
+    resultBox.classList.remove('show');
+
+    await refreshStateBeforeApply();
+    render();
+
+    const winnerIndex = Math.floor(Math.random()*n);
+    const sectorCenter = winnerIndex*sectorAngle + sectorAngle/2;
+    // случайное смещение внутри сектора, чтобы не всегда попадало ровно в центр
+    const jitter = (Math.random()-0.5) * (sectorAngle*0.5);
+    // canvas: 0deg = 3 часа, по часовой. Указатель сверху = 270deg (или -90deg)
+    const targetWithinTurn = (270 - (sectorCenter + jitter) + 360) % 360;
+
+    const fullSpins = 5 + Math.floor(Math.random()*3); // 5-7 полных оборотов
+    const finalRotation = currentRotation - (currentRotation % 360) + fullSpins*360 + targetWithinTurn;
+
+    canvas.style.transition = 'transform 4.2s cubic-bezier(0.13, 0.86, 0.18, 1)';
+    canvas.style.transform = `rotate(${finalRotation}deg)`;
+    currentRotation = finalRotation;
+
+    setTimeout(async ()=>{
+      await applyResult(sectors[winnerIndex]);
+      spinning = false;
+      btn.disabled = false;
+    }, 4300);
+  });
+
+  async function applyResult(sector){
+    state.clicks += 1;
+    let message = '';
+
+    switch(sector.type){
+      case 'mult':
+        state.salary = state.salary * sector.value;
+        message = sector.value > 1
+          ? `Барабан говорит: <b>${sector.label}</b>! Никита разбогател.`
+          : `Барабан говорит: <b>${sector.label}</b>. Никита немного погрустнел.`;
+        break;
+      case 'cuke':
+        state.cucumbers = Math.max(0, state.cucumbers + sector.value);
+        message = sector.value > 0
+          ? `Выпало <b>${sector.label}</b>. Коллекция пополнилась.`
+          : `Выпало <b>${sector.label}</b>. Часть коллекции конфисковали.`;
+        break;
+      case 'add':
+        state.salary = Math.max(0, state.salary + sector.value);
+        message = sector.value > 0
+          ? `Выпало «<b>${sector.label}</b>»! Сумму прибавили к текущей зарплате.`
+          : `Выпало «<b>${sector.label}</b>». Бухгалтерия разводит руками.`;
+        break;
+      case 'cat':
+        state.cats += 1;
+        message = `Выпал <b>драный котик</b> (уже ${state.cats}-й в коллекции). Прибавки не будет, но у Никиты теперь есть друг.`;
+        break;
+      default:
+        message = `Выпало «<b>${sector.label}</b>». Барабан сегодня в философском настроении.`;
+    }
+
+    await saveState();
+    render();
+    resultBox.innerHTML = message;
+    resultBox.classList.add('show');
+  }
+
+})();
+</script>
+</body>
+</html>
