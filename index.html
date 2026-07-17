@@ -554,10 +554,15 @@
 
     switch(sector.type){
       case 'mult':
-        state.salary = state.salary * sector.value;
-        message = sector.value > 1
-          ? `Барабан говорит: <b>${sector.label}</b>! Никита разбогател.`
-          : `Барабан говорит: <b>${sector.label}</b>. Никита немного погрустнел.`;
+        if(state.salary === 0){
+          state.salary = 13500;
+          message = `Барабан говорит: <b>${sector.label}</b>, но множить нечего — с бухгалтерии сжалились и выдали стартовые 13 500 ₽.`;
+        } else {
+          state.salary = state.salary * sector.value;
+          message = sector.value > 1
+            ? `Барабан говорит: <b>${sector.label}</b>! Никита разбогател.`
+            : `Барабан говорит: <b>${sector.label}</b>. Никита немного погрустнел.`;
+        }
         break;
       case 'cuke':
         state.cucumbers = Math.max(0, state.cucumbers + sector.value);
@@ -577,9 +582,7 @@
         break;
       case 'fired':
         state.salary = 0;
-        state.cucumbers = 0;
-        state.cats = 0;
-        message = `<b>Никита уволен.</b> Пропуск изъят, зарплата, огурцы и котики обнулены. Придётся начинать карьеру заново.`;
+        message = `<b>Никита уволен.</b> Пропуск изъят, зарплата обнулена. Огурцы и котики он всё же успел вынести с проходной.`;
         break;
       default:
         message = `Выпало «<b>${sector.label}</b>». Барабан сегодня в философском настроении.`;
