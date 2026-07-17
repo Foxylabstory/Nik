@@ -401,16 +401,14 @@
   drawWheel();
 
   // ---------- общее состояние (для всех устройств) ----------
-  // Как подключить:
-  // 1. Один раз создайте бакет: откройте в браузере или через curl
-  //    curl -X POST https://kvdb.io/
-  //    В ответ придёт ID вида "AbCd1234EfGh5678". Скопируйте его.
-  // 2. Вставьте этот ID вместо REPLACE_WITH_YOUR_BUCKET_ID ниже.
-  // Пока ID не заменён, сайт будет работать в локальном режиме
-  // (прогресс отдельно на каждом устройстве, как раньше).
-  const KVDB_BUCKET = 'UHGRsoyGDkEk3kQ7VYd5av';
-  const REMOTE_URL = `https://kvdb.io/${KVDB_BUCKET}/nikita_state`;
-  const remoteEnabled = KVDB_BUCKET !== 'REPLACE_WITH_YOUR_BUCKET_ID';
+  // Как подключить (см. инструкцию: console.firebase.google.com,
+  // создать проект → Realtime Database → Rules: {"rules":{".read":true,".write":true}}):
+  // Вставьте URL вашей базы вместо REPLACE_WITH_YOUR_FIREBASE_URL ниже.
+  // Пока URL не заменён, сайт будет работать в локальном режиме
+  // (прогресс отдельно на каждом устройстве).
+  const FIREBASE_URL = 'https://niks-salary-default-rtdb.firebaseio.com'; // напр. https://my-project-default-rtdb.firebaseio.com
+  const REMOTE_URL = `${FIREBASE_URL}/nikita_state.json`;
+  const remoteEnabled = FIREBASE_URL !== 'REPLACE_WITH_YOUR_FIREBASE_URL';
 
   const defaultState = { salary:100000, cucumbers:3, clicks:0, cats:0 };
   let state = { ...defaultState };
@@ -432,17 +430,17 @@
 
   async function fetchRemoteState(){
     const res = await fetch(REMOTE_URL, { cache:'no-store' });
-    if(res.status === 404){
-      await fetch(REMOTE_URL, { method:'POST', body: JSON.stringify(defaultState) });
+    if(!res.ok) throw new Error('Плохой статус ответа: ' + res.status);
+    const data = await res.json();
+    if(data === null){
+      await pushRemoteState(defaultState);
       return { ...defaultState };
     }
-    if(!res.ok) throw new Error('Плохой статус ответа: ' + res.status);
-    const text = await res.text();
-    return JSON.parse(text);
+    return data;
   }
 
   async function pushRemoteState(s){
-    const res = await fetch(REMOTE_URL, { method:'POST', body: JSON.stringify(s) });
+    const res = await fetch(REMOTE_URL, { method:'PUT', body: JSON.stringify(s) });
     if(!res.ok) throw new Error('Не удалось записать состояние: ' + res.status);
   }
 
@@ -509,7 +507,7 @@
     } else {
       state = loadLocalCache();
       const note = document.getElementById('syncNote');
-      note.textContent = '⚠️ Общий прогресс не настроен — см. комментарий в коде (KVDB_BUCKET). Пока прогресс хранится только в этом браузере.';
+      note.textContent = '⚠️ Общий прогресс не настроен — см. комментарий в коде (FIREBASE_URL). Пока прогресс хранится только в этом браузере.';
     }
     if(typeof state.cats !== 'number') state.cats = 0;
     render();
